@@ -11,7 +11,18 @@ import { FaHome } from "react-icons/fa";
 import Modal from "react-modal";
 import Creatable, { useCreatable } from "react-select/creatable";
 import CreatableSelect from "react-select/creatable";
+import {  Triangle } from "react-loader-spinner";
+import { generateId } from "../utils";
 
+
+const SpinnerContainer = styled.div`
+  display:flex;
+  width:100vw;
+  height:100vh;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+`
 const DetailsHeader = styled.div({
   width: "100%",
   display: "flex",
@@ -308,8 +319,9 @@ const AnimeDetails = () => {
         //     return;
         //   }
         // });
-
+        const id = generateId()
         const newCollection = {
+          id:id,
           name: name,
           anime: [currentAnime],
         };
@@ -370,9 +382,17 @@ const AnimeDetails = () => {
 
   if (loading) {
     return (
-      <div>
-        <p>Loading...</p>
-      </div>
+      <SpinnerContainer>
+        <Triangle
+      height="180"
+      width="180"
+      color="#4682B4"
+      ariaLabel="triangle-loading"
+      wrapperStyle={{}}
+      wrapperClassName=""
+      visible={true}
+    />
+      </SpinnerContainer>
     );
   }
 
@@ -624,7 +644,7 @@ const AnimeDetails = () => {
                     })
                     .map((item, index) => (
                       <LinkText
-                        to={`/collection/${item.name}`}
+                        to={`/collections/${item.name}`}
                         key={item.name + item.index}
                       >
                         {index + 1}. {item.name}

@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, gql } from "@apollo/client";
-import { Link } from "react-router-dom";
+import { Link, createSearchParams, useNavigate, useParams } from "react-router-dom";
 import styled from "@emotion/styled";
 import { GrPrevious, GrNext } from "react-icons/gr";
-import { InfinitySpin, Triangle } from "react-loader-spinner";
+import { MdCollectionsBookmark } from "react-icons/md";
+import { Triangle } from "react-loader-spinner";
+import { IconContext } from "react-icons";
+import AniColleLogo from "../assets/Ani-Colle-logo.png";
+import { generateId } from "../utils";
 
 const GET_ANIME = gql`
   query ($page: Int) {
@@ -37,73 +41,93 @@ const LinkText = styled(Link)`
   text-decoration: none;
   color: black;
 `;
+const CardText = styled.div`
+  width: 121px;
 
-// const CardContainer = styled.div`
-// display: grid;
-// grid-template-columns: repeat(auto-fit, minmax(210px, max-content));
+  font-size: 14px;
 
-// @media (max-width:500px) {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 
-//   column-gap: 50px;
-// }
-
-// `
 const PaginatorContainer = styled.div`
   display: flex;
   margin-top: 20px;
   gap: 10px;
   justify-content: center;
   width: 100vw;
-  
 `;
 
-
-const PaginatorButton =styled("button")`
+const PaginatorButton = styled("button")`
   width: 40px;
   height: 40px;
   border-color:#020626;
-  background-color: ${props => props.isSelected ? 
-    `#020626;` :`whitesmoke;`
-    }
+  background-color: ${(props) =>
+    props.isSelected ? `#020626;` : `whitesmoke;`}
   padding: 5px;
-  color:${props => props.isSelected ? 
-   `whitesmoke;`: `#020626;`
-    } 
+  color:${(props) => (props.isSelected ? `whitesmoke;` : `#020626;`)} 
   border-radius: 7px;
   font-weight:600;
   
+`;
+const HeaderContainer = styled.div`
+  background-color: #020626;
+  width: 100vw;
+  height: 9vh;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 9px;
+  color: whitesmoke;
+  border-radius: 0px 0px 5px 5px;
 `;
 const CardContainer = styled.div`
   display: flex;
   border-radius: 7px;
   width: 100vw;
-  height: 70vh;
-    
-  padding:5px;
+  height: 500px;
+  margin-right: 20px;
+  padding: 5px;
   background-color: whitesmoke;
   @media (max-width: 500px) {
-    gap: 19px;
+    gap: 10px;
     flex-direction: column;
     justify-content: space-evenly;
     flex-wrap: wrap;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 `;
 const AnimeContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding-top: 20px;
+  justify-content: flex-start;
+  padding-top: 10px;
   width: 100%;
   height: 100vh;
 `;
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
-
+  
   const { loading, error, data, refetch } = useQuery(GET_ANIME, {
     variables: { page: currentPage },
   });
+  const {page} = useParams()
+  const history =useNavigate()
+  useEffect(() => {
+    if(page)
+    setCurrentPage(page)
+  }, [])
 
+  const params = {page: currentPage}
+
+  useEffect(() => {
+    history({
+      pathname:'',
+      page:`?${createSearchParams(params)}`
+    })
+  }, [currentPage])
   const changePage = (page, event) => {
     event.preventDefault();
     setCurrentPage(page);
@@ -115,7 +139,7 @@ const Home = () => {
   let anime = data?.Page?.media;
 
   return (
-    <div style={{ height: "100vh", backgroundColor: "#4682B4" }}>
+    <div style={{ height: "120vh", backgroundColor: "#4682B4" }}>
       {/* <div>Home</div> */}
 
       {/* loading div */}
@@ -133,6 +157,31 @@ const Home = () => {
       )}
       {/* {JSON.stringify(anime?.[7])} */}
       {/* {JSON.stringify(data)} */}
+      <HeaderContainer>
+        <img src={AniColleLogo}></img>
+        <IconContext.Provider value={{ size: "30px", color:'#6ca6c1' }}>
+          <div
+            style={{
+              marginRight: "10px",
+              marginTop: "7px",
+            }}
+          >
+            <Link style={{
+              textDecoration:'none'
+            }} to={`/collections`}>
+              <MdCollectionsBookmark></MdCollectionsBookmark>
+              <div
+                style={{
+                  fontSize: "9px",
+                  color:'#6ca6c1'
+                }}
+              >
+                Collection
+              </div>
+            </Link>
+          </div>
+        </IconContext.Provider>
+      </HeaderContainer>
       <AnimeContainer>
         <CardContainer>
           {loading && (
@@ -162,16 +211,30 @@ const Home = () => {
             anime?.length > 0 &&
             anime.map((oneAnime) => (
               <LinkText to={`/anime/${oneAnime?.idMal}`}>
-                <div style={{}} key={oneAnime?.idMal}>
+                <div
+                  style={{
+                    height: "200px",
+                  }}
+                  key={oneAnime?.idMal}
+                >
                   <img
                     style={{
                       objectFit: "fill",
                       width: "118px",
                       height: "176px",
                       objectPosition: "0 0%",
+                      borderRadius: "10px",
+                      borderColor: "#020626",
+                      borderWidth: "1px",
+                      borderStyle: "solid",
                     }}
                     src={`${oneAnime?.coverImage?.large}`}
                   ></img>
+                  <CardText>
+                    {oneAnime?.title?.english
+                      ? oneAnime?.title.english
+                      : oneAnime?.title.romaji}
+                  </CardText>
                 </div>
               </LinkText>
             ))}
@@ -186,7 +249,9 @@ const Home = () => {
                   changePage(currentPage - 1, e);
                 }}
               >
-                <GrPrevious></GrPrevious>
+                <IconContext.Provider value={{ size: "20px" }}>
+                  <GrPrevious></GrPrevious>
+                </IconContext.Provider>
               </div>
             </PaginatorButton>
           )}
@@ -222,7 +287,7 @@ const Home = () => {
           )}
 
           <PaginatorButton isSelected>
-            <div >{currentPage}</div>
+            <div>{currentPage}</div>
           </PaginatorButton>
           <PaginatorButton>
             <div
@@ -251,7 +316,9 @@ const Home = () => {
                   changePage(currentPage + 1, e);
                 }}
               >
-                <GrNext></GrNext>
+                <IconContext.Provider value={{ size: "20px" }}>
+                  <GrNext></GrNext>
+                </IconContext.Provider>
               </div>
             </PaginatorButton>
           )}

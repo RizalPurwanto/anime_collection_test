@@ -10,7 +10,7 @@ import {
   ApolloProvider,
   gql,
 } from "@apollo/client";
-import ScrollToTop from './utils';
+import {ScrollToTop} from './utils';
 
 const client = new ApolloClient({
   uri: "https://graphql.anilist.co",

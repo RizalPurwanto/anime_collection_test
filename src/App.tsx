@@ -4,6 +4,8 @@ import './App.css';
 import { Route, Routes,  } from 'react-router-dom';
 import Home from './views/Home';
 import AnimeDetails from './views/AnimeDetails';
+import Collections from './views/Collections';
+import CollectionDetails from './views/CollectionDetails';
 
 
 function App() {
@@ -16,6 +18,12 @@ function App() {
           }/>
            <Route path='/anime/:animeId' element={
             <AnimeDetails></AnimeDetails>
+          }/>
+          <Route path='/collections' element={
+            <Collections></Collections>
+          }/>
+          <Route path='/collections/:collectionId' element={
+            <CollectionDetails></CollectionDetails>
           }/>
         </Routes>
       </div>
