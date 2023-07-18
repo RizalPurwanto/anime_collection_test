@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { Link } from "react-router-dom";
+import styled from "@emotion/styled";
+import { GrPrevious, GrNext } from "react-icons/gr";
+import { InfinitySpin, Triangle } from "react-loader-spinner";
 
 const GET_ANIME = gql`
   query ($page: Int) {
@@ -29,6 +32,71 @@ const GET_ANIME = gql`
     }
   }
 `;
+
+const LinkText = styled(Link)`
+  text-decoration: none;
+  color: black;
+`;
+
+// const CardContainer = styled.div`
+// display: grid;
+// grid-template-columns: repeat(auto-fit, minmax(210px, max-content));
+
+// @media (max-width:500px) {
+
+//   column-gap: 50px;
+// }
+
+// `
+const PaginatorContainer = styled.div`
+  display: flex;
+  margin-top: 20px;
+  gap: 10px;
+  justify-content: center;
+  width: 100vw;
+  
+`;
+
+
+const PaginatorButton =styled("button")`
+  width: 40px;
+  height: 40px;
+  border-color:#020626;
+  background-color: ${props => props.isSelected ? 
+    `#020626;` :`whitesmoke;`
+    }
+  padding: 5px;
+  color:${props => props.isSelected ? 
+   `whitesmoke;`: `#020626;`
+    } 
+  border-radius: 7px;
+  font-weight:600;
+  
+`;
+const CardContainer = styled.div`
+  display: flex;
+  border-radius: 7px;
+  width: 100vw;
+  height: 70vh;
+    
+  padding:5px;
+  background-color: whitesmoke;
+  @media (max-width: 500px) {
+    gap: 19px;
+    flex-direction: column;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+  }
+`;
+const AnimeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 20px;
+  width: 100%;
+  height: 100vh;
+`;
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -47,15 +115,15 @@ const Home = () => {
   let anime = data?.Page?.media;
 
   return (
-    <div style={{ height: "100vw" }}>
-      <div>Home</div>
+    <div style={{ height: "100vh", backgroundColor: "#4682B4" }}>
+      {/* <div>Home</div> */}
 
       {/* loading div */}
-      {loading && (
+      {/* {loading && (
         <div>
           <p>Loading...</p>
         </div>
-      )}
+      )} */}
 
       {/* error div  */}
       {error && (
@@ -65,96 +133,66 @@ const Home = () => {
       )}
       {/* {JSON.stringify(anime?.[7])} */}
       {/* {JSON.stringify(data)} */}
-      <div
-        style={{
-          display: "flex",
-          //   flex: "flex-grow",
-          //   gap:'20px',
-          flexDirection: "row",
-          padding: "5px",
-          //   justifyContent: "space-evenly",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          flexFlow: "row wrap",
-          width: "100%",
-          height: "70vw",
-        }}
-        className="anime-container"
-      >
-        {/* container */}
-        <div
-          style={{
-            // display: "flex",
-            // justifyContent: "flex-start",
-            width: "100%",
-            height: "100%",
-            // flexWrap: "wrap",
-            // flexFlow: "row wrap",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(210px, max-content))",
-            gap: "20px",
-            justifyContent: "center",
-            padding: "initial",
-          }}
-        >
-          {anime?.length > 0 &&
+      <AnimeContainer>
+        <CardContainer>
+          {loading && (
+            <div
+              style={{
+                width: "100vw",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              {/* <InfinitySpin 
+            width='200'
+            color="#4682B4"
+          /> */}
+              <Triangle
+                height="180"
+                width="180"
+                color="#4682B4"
+                ariaLabel="triangle-loading"
+                wrapperStyle={{}}
+                wrapperClassName=""
+                visible={true}
+              />
+            </div>
+          )}
+          {!loading &&
+            anime?.length > 0 &&
             anime.map((oneAnime) => (
-              <Link to={`/anime/${oneAnime?.idMal}`}>
-                <div
-                  style={{
-                    width: "18vw",
-                    height: "20vw",
-                  }}
-                  key={oneAnime?.idMal}
-                >
-                  {/* card */}
+              <LinkText to={`/anime/${oneAnime?.idMal}`}>
+                <div style={{}} key={oneAnime?.idMal}>
                   <img
                     style={{
                       objectFit: "fill",
-                      width: "100%",
-                      height: "30vw",
+                      width: "118px",
+                      height: "176px",
                       objectPosition: "0 0%",
                     }}
                     src={`${oneAnime?.coverImage?.large}`}
                   ></img>
-                  <div style={{ width: "100%" }}>
-                    <p
-                      style={{
-                        textAlign: "center",
-                        wordBreak: "break-word",
-                        overflowWrap: "break-word",
-                      }}
-                    >
-                      {oneAnime?.title?.english
-                        ? oneAnime?.title?.english
-                        : oneAnime?.title?.romaji}
-                    </p>
-                  </div>
                 </div>
-              </Link>
+              </LinkText>
             ))}
-        </div>
-        <div>
-          Pagination
-          <div
-            style={{ display: "flex", justifyContent: "center", gap: "5px" }}
-          >
-            {currentPage > 1 && (
+        </CardContainer>
+
+        <PaginatorContainer>
+          {currentPage > 1 && (
+            <PaginatorButton>
+              {" "}
               <div
                 onClick={(e) => {
                   changePage(currentPage - 1, e);
                 }}
               >
-                Previous
+                <GrPrevious></GrPrevious>
               </div>
-            )}
-            {/* {Array.apply(0, Array(5)).map((x, i) => {
-              if( x-1 >= 0) {
-                  return (<div style={{ color: "red" }}>{currentPage}</div>)
-              }
-            })} */}
+            </PaginatorButton>
+          )}
 
-            {currentPage >= 3 && (
+          {currentPage >= 3 && (
+            <PaginatorButton>
               <div
                 onClick={(e) => {
                   changePage(currentPage - 2, e);
@@ -162,8 +200,17 @@ const Home = () => {
               >
                 {currentPage - 2}
               </div>
-            )}
-            {currentPage >= 2 && (
+            </PaginatorButton>
+          )}
+
+          {/* {Array.apply(0, Array(5)).map((x, i) => {
+              if( x-1 >= 0) {
+                  return (<div style={{ color: "red" }}>{currentPage}</div>)
+              }
+            })} */}
+
+          {currentPage >= 2 && (
+            <PaginatorButton>
               <div
                 onClick={(e) => {
                   changePage(currentPage - 1, e);
@@ -171,8 +218,13 @@ const Home = () => {
               >
                 {currentPage - 1}
               </div>
-            )}
-            <div style={{ color: "red" }}>{currentPage}</div>
+            </PaginatorButton>
+          )}
+
+          <PaginatorButton isSelected>
+            <div >{currentPage}</div>
+          </PaginatorButton>
+          <PaginatorButton>
             <div
               onClick={(e) => {
                 changePage(currentPage + 1, e);
@@ -180,6 +232,9 @@ const Home = () => {
             >
               {currentPage + 1}
             </div>
+          </PaginatorButton>
+
+          <PaginatorButton>
             <div
               onClick={(e) => {
                 changePage(currentPage + 2, e);
@@ -187,18 +242,39 @@ const Home = () => {
             >
               {currentPage + 2}
             </div>
-            {currentPage < 500 && (
+          </PaginatorButton>
+
+          {currentPage < 500 && (
+            <PaginatorButton>
               <div
                 onClick={(e) => {
                   changePage(currentPage + 1, e);
                 }}
               >
-                Next
+                <GrNext></GrNext>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </PaginatorButton>
+          )}
+        </PaginatorContainer>
+      </AnimeContainer>
+      {/* <div
+        style={{
+          display: "flex",
+          //   flex: "flex-grow",
+          //   gap:'20px',
+          flexDirection:'column',
+          paddingTop: "20px",
+          //   justifyContent: "space-evenly",
+          justifyContent: "center",
+         
+          width: "100%",
+          height: "100vh",
+        }}
+        className="anime-container"
+      >
+       
+        
+      </div> */}
     </div>
   );
 };
