@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useQuery, gql } from "@apollo/client";
-import { Link, createSearchParams, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  createSearchParams,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import styled from "@emotion/styled";
 import { GrPrevious, GrNext } from "react-icons/gr";
 import { MdCollectionsBookmark } from "react-icons/md";
@@ -36,11 +41,57 @@ const GET_ANIME = gql`
     }
   }
 `;
+const AnimeImage = styled.img`
+  object-fit: fill;
+  width: 177px;
+    height: 264px;
+    margin-left: 20px;
+    margin-top: 20px;
+  @media (max-width: 600px) {
+    width: 118px;
+    height: 176px;
+    margin-left: 0px;
+    margin-top: 0px;
+    border-color: #020626;
+  border-width: 1px;
+  border-style: solid;
+  }
+  object-position: 0 0%;
+  
+  
+  border-radius: 5%;
+`;
 
 const LinkText = styled(Link)`
   text-decoration: none;
   color: black;
 `;
+
+const IconContainer = styled.div`
+margin-right: 10px;
+margin-top: 7px;
+
+`
+const IconLink = styled(Link)`
+  display:flex;
+  text-decoration:none;
+  margin-top:3px;
+  @media (max-width: 600px) {
+    display:inline;
+    margin-bottom:4px;
+  }
+
+
+
+`
+const IconText = styled.div`
+  font-size:20px;
+  color:#6ca6c1;
+  margin-left:3px;
+  @media (max-width: 600px) {
+    font-size:9px;
+  }
+`
 const CardText = styled.div`
   width: 121px;
 
@@ -75,59 +126,101 @@ const PaginatorButton = styled("button")`
 `;
 const HeaderContainer = styled.div`
   background-color: #020626;
-  width: 100vw;
+  width: 100%;
   height: 9vh;
   display: flex;
-  justify-content: space-between;
-  padding-right: 9px;
+  justify-content:flex-start;
+  gap:200px;
+  padding-left:100px;
+  padding-right:00px;
+  @media(max-width:600px) {
+    padding-left:0px;
+    padding-right: 9px;
+    justify-content: space-between;
+    width: 100vw;
+    gap:0px;
+  }
   color: whitesmoke;
   border-radius: 0px 0px 5px 5px;
 `;
 const CardContainer = styled.div`
   display: flex;
-  border-radius: 7px;
+  border-radius: 5%;
   width: 100vw;
-  height: 500px;
-  margin-right: 20px;
-  padding: 5px;
+  
+  height: 80vw;
+  
+  margin-top:20px;
+  padding-right: 5px;
   background-color: whitesmoke;
+  
+
+  gap: 40px;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-y: auto;
+
   @media (max-width: 500px) {
+    margin-top:10px;
+    margin-right: 20px;
+    background-color: whitesmoke;
+    justify-content: space-evenly;
     gap: 10px;
+    width: 100vw;
     flex-direction: column;
     justify-content: space-evenly;
     flex-wrap: wrap;
     overflow-y: auto;
+    height: 500px;
+    border-radius: 0%;
   }
 `;
 const AnimeContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items:center;
   padding-top: 10px;
   width: 100%;
-  height: 100vh;
+  height: 120vh;
+
+   @media (max-width: 500px) {
+    justify-content: flex-start;
+    align-items:flex-start;
+    width:100vh;
+  }
 `;
+
+const Background = styled.div`
+  background-color:#4682B4;
+  height:140vh;
+  @media (max-width: 500px) {
+    justify-content: flex-start;
+    align-items:flex-start;
+    height:100vh;
+  }
+`
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const { loading, error, data, refetch } = useQuery(GET_ANIME, {
     variables: { page: currentPage },
   });
-  const {page} = useParams()
-  const history =useNavigate()
+  const { page } = useParams();
+  const history = useNavigate();
   useEffect(() => {
-    if(page)
-    setCurrentPage(page)
-  }, [])
+    if (page) setCurrentPage(page);
+  }, []);
 
-  const params = {page: currentPage}
+  const params = { page: currentPage };
 
   useEffect(() => {
     history({
-      pathname:'',
-      page:`?${createSearchParams(params)}`
-    })
-  }, [currentPage])
+      pathname: "",
+      page: `?${createSearchParams(params)}`,
+    });
+  }, [currentPage]);
   const changePage = (page, event) => {
     event.preventDefault();
     setCurrentPage(page);
@@ -139,7 +232,7 @@ const Home = () => {
   let anime = data?.Page?.media;
 
   return (
-    <div style={{ height: "120vh", backgroundColor: "#4682B4" }}>
+    <Background >
       {/* <div>Home</div> */}
 
       {/* loading div */}
@@ -159,27 +252,22 @@ const Home = () => {
       {/* {JSON.stringify(data)} */}
       <HeaderContainer>
         <img src={AniColleLogo}></img>
-        <IconContext.Provider value={{ size: "30px", color:'#6ca6c1' }}>
-          <div
-            style={{
-              marginRight: "10px",
-              marginTop: "7px",
-            }}
+        <IconContext.Provider value={{ size: "30px", color: "#6ca6c1" }}>
+          <IconContainer
+            
           >
-            <Link style={{
-              textDecoration:'none'
-            }} to={`/collections`}>
+            <IconLink
+              
+              to={`/collections`}
+            >
               <MdCollectionsBookmark></MdCollectionsBookmark>
-              <div
-                style={{
-                  fontSize: "9px",
-                  color:'#6ca6c1'
-                }}
+              <IconText
+                
               >
                 Collection
-              </div>
-            </Link>
-          </div>
+              </IconText>
+            </IconLink>
+          </IconContainer>
         </IconContext.Provider>
       </HeaderContainer>
       <AnimeContainer>
@@ -217,7 +305,12 @@ const Home = () => {
                   }}
                   key={oneAnime?.idMal}
                 >
-                  <img
+                  <AnimeImage
+                  
+                  src={`${oneAnime?.coverImage?.large}`}>
+
+                  </AnimeImage>
+                  {/* <img
                     style={{
                       objectFit: "fill",
                       width: "118px",
@@ -229,7 +322,7 @@ const Home = () => {
                       borderStyle: "solid",
                     }}
                     src={`${oneAnime?.coverImage?.large}`}
-                  ></img>
+                  ></img> */}
                   <CardText>
                     {oneAnime?.title?.english
                       ? oneAnime?.title.english
@@ -342,7 +435,7 @@ const Home = () => {
        
         
       </div> */}
-    </div>
+    </Background>
   );
 };
 
