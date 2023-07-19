@@ -22,7 +22,7 @@ const AlertText = styled.div`
 const CollectionContainerWrapper = styled.div`
   @media (max-width: 600px) {
     display: flex;
-    height:100vh;
+    height: 100vh;
     flex-direction: column;
     justify-content: flex-start;
   }
@@ -31,7 +31,7 @@ const CollectionContainer = styled.div`
   @media (max-width: 600px) {
   }
   display: flex;
-  
+
   margin-bottom: 5px;
   flex-direction: column;
   align-items: center;
@@ -75,33 +75,35 @@ const CollectionContent = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content:flex-start;
-  gap: 10px;
+  justify-content: flex-start;
+  
   overflow-x: auto;
   width: 90%;
   padding: 4px;
   border-radius: 5px;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const CollectionItemCard = styled.div`
   height: 100%;
 `;
 const CardLink = styled(Link)`
-  height:70vh;
-  text-decoration:none;
-  color:whitesmoke;
-  width:50vw;
-  margin-bottom:5px;
+height: 55vh;
+  @media (max-height: 500px) {
+    height: 50vh;
+  };
+  text-decoration: none;
+  color: whitesmoke;
+  width: 50vw;
   
-`
+`;
 
 const CollectionItemText = styled.div`
   @media (max-width: 600px) {
   }
-  font-size: 14px;
-  font-weight:700;
-
+  font-size: 15px;
+  font-weight: 700;
+  text-align:left;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -173,6 +175,7 @@ const PageTitleText = styled.div`
   }
   font-size: 20px;
   font-weight: 600;
+  
 `;
 const PageTitleContainer = styled.div`
   @media (max-width: 600px) {
@@ -210,6 +213,10 @@ const CollectionDetails = () => {
   };
   const [storageCollection, setStorageCollection] = useState(initializeState());
   const [selectedCollection, setSelectedCollection] = useState("");
+  const [selectedAnime, setselectedAnime] = useState({
+    name:'',
+    id:''
+  });
   const [modalIsOpen, setIsOpen] = useState(false);
   const [confirmationModalIsOpen, setConfirmationModalIsOpen] = useState(false);
   const [modalInput, setModalInput] = useState("");
@@ -232,15 +239,27 @@ const CollectionDetails = () => {
     localStorage.setItem("collections", JSON.stringify(storageCollection));
   }, [storageCollection]);
 
-  const handleRemoveCollection = (event) => {
+  const handleRemoveAnime = (event) => {
     event.preventDefault();
+
+    const collectionWithoutSelectedAnime = collectionDetails.anime.filter((el) => el.id !== selectedAnime.id)
+   
+
     let collectionsWithoutSelected = storageCollection.filter(
-      (el) => el.name !== selectedCollection
+      (el) => el.name !== collectionId
     );
+
+    let updatedCollection = {
+        name:collectionId,
+        anime:collectionWithoutSelectedAnime
+    }
+
+    collectionsWithoutSelected.push(updatedCollection)
     console.log(
-      collectionsWithoutSelected,
-      `COllection named ${selectedCollection} REMOVED`
+        collectionWithoutSelectedAnime,
+      `ANIME named ${selectedAnime.name} REMOVED`
     );
+    console.log(collectionsWithoutSelected, "ZOM REMOVED FROM ACTION")
     setStorageCollection(collectionsWithoutSelected);
     closeConfirmationModal();
   };
@@ -298,9 +317,13 @@ const CollectionDetails = () => {
     // subtitle.style.color = "#f00";
   }
 
-  function openConfirmationModal(name) {
+  function openConfirmationModal(event, anime) {
+    event.preventDefault()
     setConfirmationModalIsOpen(true);
-    setSelectedCollection(name);
+    setselectedAnime({
+        title:anime.title,
+        id:anime.id
+    });
   }
 
   return (
@@ -367,8 +390,8 @@ const CollectionDetails = () => {
           }}
         >
           <div>
-            Are you sure you want to remove "{selectedCollection}" from your
-            collections?
+            Are you sure you want to remove "{selectedAnime.title}" from this
+            collection?
           </div>
           <div>
             <AiFillCloseCircle
@@ -376,7 +399,7 @@ const CollectionDetails = () => {
             ></AiFillCloseCircle>
           </div>
         </div>
-        <ModalForm onSubmit={(e) => handleRemoveCollection(e)}>
+        <ModalForm onSubmit={(e) => handleRemoveAnime(e)}>
           <div>
             <div
               style={{
@@ -419,19 +442,54 @@ const CollectionDetails = () => {
         </IconContext.Provider>
       </HeaderContainer>
       <PageTitleContainer>
-        <PageTitleText>{`Collection  >  `} {collectionDetails.name}</PageTitleText>
+        <PageTitleText>
+          {`Collection  >  `} {collectionDetails.name}
+        </PageTitleText>
       </PageTitleContainer>
       <CollectionContainerWrapper>
         <CollectionContainer>
-          <CollectionContent>
+          <CollectionContent className="collection content">
             {collectionDetails.anime.map((a, i) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "20px",
+                  
+                }}
+              >
+                <div
+                  style={{
+                    display:'flex',
+                    backgroundColor:'#020626',
+                    height:'70px',
+                    width:'60px',
+                    justifyContent:'center',
+                    alignItems:'center',
+                    flexDirection:'column',
+                    borderRadius:'7px'
+                  }}
+
+                  onClick={(e) =>openConfirmationModal(e, a)}
+                >
+                  <IconContext.Provider
+                    value={{ size: "30px", color: "#6ca6c1" }}
+                  >
+                    <BsFillTrash3Fill></BsFillTrash3Fill>
+                  </IconContext.Provider>
+                  <div style={{
+                    color: "#6ca6c1", 
+                    fontSize:'13px',
+                    fontWeight:'600'
+                  }}>Remove</div>
+                </div>
                 <CardLink to={`/anime/${a.id}`}>
-                <CollectionItemCard key={a.title + i}>
-                <CoverImage src={a.image}></CoverImage>
-                <CollectionItemText>{a.title}</CollectionItemText>
-              </CollectionItemCard>
+                  <CollectionItemCard key={a.title + i}>
+                    <CoverImage src={a.image}></CoverImage>
+                    <CollectionItemText>{a.title}</CollectionItemText>
+                  </CollectionItemCard>
                 </CardLink>
-              
+              </div>
             ))}
           </CollectionContent>
         </CollectionContainer>
