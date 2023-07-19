@@ -11,39 +11,64 @@ import { FaHome } from "react-icons/fa";
 import Modal from "react-modal";
 import Creatable, { useCreatable } from "react-select/creatable";
 import CreatableSelect from "react-select/creatable";
-import {  Triangle } from "react-loader-spinner";
+import { Triangle } from "react-loader-spinner";
 import { generateId } from "../utils";
 
-
 const SpinnerContainer = styled.div`
-  display:flex;
-  width:100vw;
-  height:100vh;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-`
-const DetailsHeader = styled.div({
-  width: "100%",
-  display: "flex",
-  flexDirection: "row",
-  // height: "25vh",
-  position: "relative",
-  justifyContent: "flex-start",
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 
-  backgroundColor: "#f7fff7",
-  gap: "10px",
-  height: "18vh",
-});
+const HeaderWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 30vh;
+  width: 100%;
+  @media(min-height:600px) {
+    height: 50vh;
+  }
+`;
+const DetailsHeader = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  justify-content: flex-start;
+  background-color: #f7fff7;
+  gap: 10px;
+  height: 18vh;
+
+  @media (min-height: 600px) {
+    height: 30vh;
+  }
+`;
+// const DetailsHeader = styled.div({
+//   width: "100%",
+//   display: "flex",
+//   flexDirection: "row",
+//   // height: "25vh",
+//   position: "relative",
+//   justifyContent: "flex-start",
+
+//   backgroundColor: "#f7fff7",
+//   gap: "10px",
+//   height: "18vh",
+// });
 
 const Banner = styled.div`
   width: 100%;
-  height: 22vw;
+  @media (min-height: 600px) {
+    height: 30vh;
+  }
   display: flex;
   overflow: hidden;
   justify-content: center;
   align-items: center;
-  background-position: 50% 30%;
+  background-position: 50% -20%;
   @media (max-width: 600px) {
     background-position: 50% 50%;
   }
@@ -67,7 +92,12 @@ const Button = styled.button`
   font-weight: blod;
   border-radius: 8px;
   color: white;
-  font-size: 17px;
+  font-size: 15px;
+  width:170px;
+  @media (min-width:600px) {
+    margin-top:10px;
+  }
+
   &:hover {
     background-color: #8693ab;
     color: white;
@@ -216,6 +246,10 @@ const customStyles = {
 };
 const CoverImage = styled.img`
   border-radius: 4%;
+
+  @media (min-width: 600px) {
+    margin-top: 90px;
+  }
 `;
 const AnimeDetails = () => {
   const [modalInput, setModalInput] = useState("");
@@ -250,8 +284,6 @@ const AnimeDetails = () => {
     setNewCollections([]);
     setAlert("");
   }
-
-
 
   const initializeState = () => {
     return JSON.parse(localStorage.getItem("collections")) || [];
@@ -319,9 +351,9 @@ const AnimeDetails = () => {
         //     return;
         //   }
         // });
-        const id = generateId()
+        const id = generateId();
         const newCollection = {
-          id:id,
+          id: id,
           name: name,
           anime: [currentAnime],
         };
@@ -384,14 +416,14 @@ const AnimeDetails = () => {
     return (
       <SpinnerContainer>
         <Triangle
-      height="180"
-      width="180"
-      color="#4682B4"
-      ariaLabel="triangle-loading"
-      wrapperStyle={{}}
-      wrapperClassName=""
-      visible={true}
-    />
+          height="180"
+          width="180"
+          color="#4682B4"
+          ariaLabel="triangle-loading"
+          wrapperStyle={{}}
+          wrapperClassName=""
+          visible={true}
+        />
       </SpinnerContainer>
     );
   }
@@ -413,13 +445,7 @@ const AnimeDetails = () => {
       {/* {JSON.stringify(anime?.characters.nodes[0])} */}
       {/* {JSON.stringify(data?.Media.characters)} */}
       <AnimeContainer className="anime-container">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            height: "30vh",
-            width: "100%",
-          }}
+        <HeaderWrap
           className="header-wrap"
         >
           <Banner src={anime?.bannerImage}></Banner>
@@ -446,42 +472,54 @@ const AnimeDetails = () => {
                     className="actions"
                     style={{
                       display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "flex-end",
+                      flexDirection: isMobile? "column" :"row",
+                      justifyContent: isMobile? "flex-end" :"flex-start",
+                      gap:isMobile? '0px' : '4px',
+                      width:'100%'
                     }}
                   >
-                    {isSmallScreen &&  <IconContext.Provider value={{ color: "white", size:'30px' }}>
-                    <div
-                      className="actions"
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "flex-end",
-                        alignContent:'flex-start',
-                        marginBottom:'5px'
-                        
-                      }}
-                    >
-                      
-                      <HomeLink to={'/'}><AiFillHome></AiFillHome></HomeLink>
-                    </div>
-                  </IconContext.Provider>}
+                    {isSmallScreen && (
+                      <IconContext.Provider
+                        value={{ color: "white", size: "30px" }}
+                      >
+                        <div
+                          className="actions"
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "flex-end",
+                            alignContent: "flex-start",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          <HomeLink to={"/"}>
+                            <AiFillHome></AiFillHome>
+                          </HomeLink>
+                        </div>
+                      </IconContext.Provider>
+                    )}
                     <Button onClick={openModal}>+ Add to My Collection</Button>
-                  </div>
-                 {!isSmallScreen &&  <IconContext.Provider value={{ color: "white", size:'30px' }}>
-                    <div
-                      className="actions"
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "flex-end",
-                        
-                      }}
+                    {!isSmallScreen && (
+                    <IconContext.Provider
+                      value={{ color: "white", size: "30px" }}
                     >
-                      
-                      <HomeLink to={'/'}><AiFillHome></AiFillHome></HomeLink>
-                    </div>
-                  </IconContext.Provider>}
+                      <div
+                        className="actions"
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "flex-end",
+                          
+                        }}
+                      >
+                        <HomeLink to={"/"}>
+                          <AiFillHome></AiFillHome>
+                        </HomeLink>
+                      </div>
+                    </IconContext.Provider>
+                  )}
+                  </div>
+                  
                 </CoverWrapperInner>
               </CoverWrap>
               {isMobile && (
@@ -489,9 +527,9 @@ const AnimeDetails = () => {
                   className="title"
                   style={{
                     float: "left",
-                    display:'inline-block',
+                    display: "inline-block",
                     marginTop: "5px",
-                    fontSize: isSmallScreen ? '16px' : "18px",
+                    fontSize: isSmallScreen ? "16px" : "18px",
                     color: "#313638",
                     fontWeight: "600",
                   }}
@@ -519,7 +557,7 @@ const AnimeDetails = () => {
               >
                 <div
                   className="title"
-                  style={{ fontSize: "23px", fontWeight: "900" }}
+                  style={{ fontSize: "23px", fontWeight: "600" }}
                 >
                   {anime.title.english
                     ? anime.title.english
@@ -547,8 +585,34 @@ const AnimeDetails = () => {
           >
             
           </div> */}
-        </div>
+        </HeaderWrap>
+{!isMobile && (<AnimeInfo className="anime-info">
+              <InfoItem>
+                <ItemType>Genres</ItemType>
+                {anime.genres.join(", ")}
+              </InfoItem>
+              <InfoItem>
+                <ItemType>Format</ItemType>
+                {anime.format}
+              </InfoItem>
 
+              <InfoItem>
+                <ItemType>Episodes</ItemType>
+                {anime.episodes}
+              </InfoItem>
+              <InfoItem>
+                <ItemType>Episodes Duration</ItemType>
+                {anime.duration} minutes
+              </InfoItem>
+              <InfoItem>
+                <ItemType>Average Score</ItemType>
+                {anime.averageScore}%
+              </InfoItem>
+              <InfoItem>
+                <ItemType>Mean Score</ItemType>
+                {anime.meanScore}%
+              </InfoItem>
+            </AnimeInfo>)}
         {isMobile && (
           <ContentContainer className="content-container">
             <Modal
@@ -739,6 +803,12 @@ const AnimeInfo = styled.div`
   background-color: #f7fff7;
   display: flex;
   flex-direction: column;
+  
+  @media (min-width: 600px) {
+    height:60vh;
+    margin-top:140px;
+    margin-left:20px;
+  }
   @media (max-width: 600px) {
     flex-direction: row;
   }
@@ -828,8 +898,11 @@ const HomeLink = styled(Link)`
   color: white;
 
   font-weight: 600;
-  padding:3px;
+  padding: 3px;
   width: 10vw;
+  @media(min-width:600px) {
+    width: 50px;
+  };
   border-radius: 10px;
   background-color: #6ca6c1;
   &:hover {
@@ -853,7 +926,7 @@ const AnimeContainer = styled.div`
   @media (max-width: 600px) {
     height: 5000px;
   }
-  background-color: #4682B4;
+  background-color: #4682b4;
 `;
 const ShowButtonContainer = styled.div`
   display: flex;
